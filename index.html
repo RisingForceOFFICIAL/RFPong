@@ -1,442 +1,694 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RFPong - Retro Arcade Game</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
---bg:#0a0d12;--bg2:#0f1419;--bg3:#151d27;
---text:#e2e8f0;--text2:#8899aa;--text3:#5a6d7e;
---accent:#0ea5e9;--accent2:#67e8f9;--green:#00d68f;--orange:#f59e0b;--red:#ef4444;
---border:#1e2d3d;--card:#0f1720;
-}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;overflow:hidden;user-select:none}
-
-/* Header */
-.header{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px;background:rgba(10,13,18,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-.header-content{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto}
-.logo{font-size:24px;font-weight:700;color:var(--accent2);display:flex;align-items:center;gap:8px}
-.logo .icon{animation:bounce 2s ease-in-out infinite}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.score{font-family:'Courier New',monospace;font-size:18px;font-weight:600;display:flex;align-items:center;gap:16px}
-.score-item{display:flex;flex-direction:column;align-items:center;gap:4px}
-.score-label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
-.score-value{color:var(--accent2);font-size:24px}
-
-/* Game Canvas */
-.game-container{position:fixed;top:80px;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(14,165,233,0.03) 0%,transparent 70%)}
-#gameCanvas{border:2px solid var(--accent);border-radius:8px;background:#000;box-shadow:0 0 30px rgba(14,165,233,0.3),inset 0 0 50px rgba(14,165,233,0.1)}
-
-/* Controls */
-.controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.btn{padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.3s;font-family:inherit}
-.btn:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 4px 15px rgba(14,165,233,0.4)}
-.btn:active{transform:translateY(0)}
-.btn-secondary{background:var(--bg3);border:1px solid var(--border)}
-.btn-secondary:hover{background:var(--bg4);border-color:var(--accent)}
-
-/* Game Over Screen */
-.game-over{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:200}
-.game-over.active{display:flex}
-.game-over-content{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;max-width:400px;animation:slideIn 0.5s ease-out}
-@keyframes slideIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
-.game-over h2{font-size:28px;margin-bottom:16px;color:var(--accent2)}
-.game-over p{color:var(--text2);margin-bottom:24px;font-size:16px}
-.final-score{font-family:'Courier New',monospace;font-size:24px;color:var(--accent);margin-bottom:24px;font-weight:600}
-
-/* Instructions */
-.instructions{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;max-width:500px;z-index:150}
-.instructions.hidden{display:none}
-.instructions h2{color:var(--accent2);margin-bottom:20px;font-size:24px}
-.instructions ul{list-style:none;margin:20px 0;color:var(--text2)}
-.instructions li{margin:8px 0;display:flex;align-items:center;gap:12px;justify-content:flex-start;text-align:left}
-.instructions .key{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-family:'Courier New',monospace;font-size:12px;min-width:50px;text-align:center;color:var(--accent2)}
-
-/* Mobile Controls */
-.mobile-controls{display:none;position:fixed;bottom:100px;left:0;right:0;justify-content:space-between;padding:0 40px;z-index:100}
-.mobile-btn{width:80px;height:80px;background:var(--accent);border:none;border-radius:50%;color:#fff;font-size:24px;cursor:pointer;transition:all 0.3s;opacity:0.8}
-.mobile-btn:active{background:var(--accent2);transform:scale(1.1)}
-
-@media(max-width:768px){
-.mobile-controls{display:flex}
-.controls{bottom:200px}
-.score{font-size:16px}
-.score-value{font-size:20px}
-}
-
-/* Particles */
-.particle{position:absolute;pointer-events:none;border-radius:50%;background:var(--accent2);opacity:0.8;animation:particleFade 1s ease-out forwards}
-@keyframes particleFade{0%{opacity:0.8;transform:scale(1)}100%{opacity:0;transform:scale(0.3)}}
-
-/* Retro Glow Effects */
-.glow{text-shadow:0 0 10px currentColor;box-shadow:0 0 20px currentColor}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RFPong</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --bg2: #111;
+            --bg3: #1a1a1a;
+            --accent: #0ea5e9;
+            --accent2: #67e8f9;
+            --text: #fff;
+            --text2: #aaa;
+        }
+        .light {
+            --bg: #f5f5f5;
+            --bg2: #e5e5e5;
+            --bg3: #d5d5d5;
+            --accent: #0284c7;
+            --accent2: #0ea5e9;
+            --text: #111;
+            --text2: #555;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .logo span { color: var(--accent); }
+        .theme-toggle {
+            background: var(--bg2);
+            border: 1px solid var(--bg3);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .score-board {
+            display: flex;
+            gap: 3rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .score-label {
+            font-size: 0.875rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .score-value {
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent);
+        }
+        #gameCanvas {
+            border: 2px solid var(--accent);
+            border-radius: 0.5rem;
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
+            background: var(--bg2);
+            touch-action: none;
+        }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            color: #fff;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(14, 165, 233, 0.4);
+        }
+        .btn.secondary {
+            background: var(--bg3);
+            color: var(--text);
+        }
+        .btn.secondary:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        .difficulty {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .diff-btn {
+            background: var(--bg3);
+            border: 2px solid transparent;
+            color: var(--text2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+        .diff-btn:hover, .diff-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .diff-btn.active {
+            background: rgba(14, 165, 233, 0.1);
+        }
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: 0 0 30px var(--accent);
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .message.show { opacity: 1; }
+        .game-wrapper {
+            position: relative;
+        }
+        .mobile-controls {
+            display: none;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .mobile-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg3);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.2s;
+        }
+        .mobile-btn:active {
+            background: var(--accent);
+            color: #fff;
+            transform: scale(0.95);
+        }
+        @media (max-width: 768px) {
+            .score-board { font-size: 1.75rem; gap: 2rem; }
+            .mobile-controls { display: flex; }
+            .controls { flex-wrap: wrap; justify-content: center; }
+        }
+        @media (max-width: 500px) {
+            .header { padding: 0.75rem 1rem; }
+            .logo { font-size: 1.25rem; }
+            .score-board { font-size: 1.5rem; gap: 1.5rem; }
+        }
+        .instructions {
+            color: var(--text2);
+            font-size: 0.875rem;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        .win-line {
+            font-size: 0.875rem;
+            color: var(--text2);
+        }
+    </style>
 </head>
 <body>
+    <header class="header">
+        <div class="logo"><span>RF</span>Pong</div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </header>
 
-<div class="header">
-<div class="header-content">
-<div class="logo"><span class="icon">🏓</span> RFPong</div>
-<div class="score">
-<div class="score-item">
-<div class="score-label">Player</div>
-<div class="score-value" id="playerScore">0</div>
-</div>
-<div class="score-item">
-<div class="score-label">AI</div>
-<div class="score-value" id="aiScore">0</div>
-</div>
-</div>
-</div>
-</div>
+    <div class="container">
+        <div class="score-board">
+            <div class="score">
+                <span class="score-label">You</span>
+                <span class="score-value" id="playerScore">0</span>
+            </div>
+            <div class="score">
+                <span class="score-label">AI</span>
+                <span class="score-value" id="aiScore">0</span>
+            </div>
+        </div>
+        <span class="win-line">First to <span id="winTarget">5</span> wins!</span>
+        
+        <div class="game-wrapper">
+            <canvas id="gameCanvas"></canvas>
+            <div class="message" id="message"></div>
+        </div>
 
-<div class="game-container">
-<canvas id="gameCanvas" width="800" height="400"></canvas>
-</div>
+        <div class="mobile-controls">
+            <button class="mobile-btn" id="upBtn">▲</button>
+            <button class="mobile-btn" id="downBtn">▼</button>
+        </div>
 
-<div class="controls">
-<button class="btn" id="pauseBtn">⏸️ Pause</button>
-<button class="btn btn-secondary" id="resetBtn">🔄 Reset</button>
-<button class="btn btn-secondary" id="helpBtn">❓ Help</button>
-</div>
+        <div class="controls">
+            <button class="btn" id="startBtn" onclick="startGame()">Start</button>
+            <button class="btn secondary" onclick="resetGame()">Reset</button>
+        </div>
 
-<div class="mobile-controls">
-<button class="mobile-btn" id="upBtn">▲</button>
-<button class="mobile-btn" id="downBtn">▼</button>
-</div>
+        <div class="difficulty">
+            <button class="diff-btn active" data-diff="easy">Easy</button>
+            <button class="diff-btn" data-diff="medium">Medium</button>
+            <button class="diff-btn" data-diff="hard">Hard</button>
+            <button class="diff-btn" data-diff="impossible">💀</button>
+        </div>
 
-<div class="instructions" id="instructions">
-<h2>🏓 How to Play RFPong</h2>
-<ul>
-<li><span class="key">W / ↑</span> Move paddle up</li>
-<li><span class="key">S / ↓</span> Move paddle down</li>
-<li><span class="key">Space</span> Pause game</li>
-<li><span class="key">R</span> Reset game</li>
-</ul>
-<p style="color:var(--text2);margin:20px 0">First to 7 points wins! Ball gets faster with each hit.</p>
-<button class="btn" onclick="startGame()">🚀 Start Playing</button>
-</div>
+        <p class="instructions">Use ↑↓ or W/S to move • Touch buttons on mobile</p>
+    </div>
 
-<div class="game-over" id="gameOver">
-<div class="game-over-content">
-<h2 id="gameOverTitle">Game Over!</h2>
-<p id="gameOverText">Great game!</p>
-<div class="final-score" id="finalScore">Player 5 - 7 AI</div>
-<button class="btn" onclick="resetGame()">🔄 Play Again</button>
-<button class="btn btn-secondary" onclick="showInstructions()">📖 Instructions</button>
-</div>
-</div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const messageEl = document.getElementById('message');
+        const playerScoreEl = document.getElementById('playerScore');
+        const aiScoreEl = document.getElementById('aiScore');
+        const startBtn = document.getElementById('startBtn');
 
-<script>
-// Game variables
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-let gameRunning = false;
-let gamePaused = false;
-let animationId;
+        // Responsive canvas
+        function resizeCanvas() {
+            const maxW = Math.min(window.innerWidth - 40, 800);
+            const maxH = Math.min(window.innerHeight - 350, 500);
+            const ratio = 800 / 500;
+            
+            if (maxW / ratio <= maxH) {
+                canvas.width = maxW;
+                canvas.height = maxW / ratio;
+            } else {
+                canvas.height = maxH;
+                canvas.width = maxH * ratio;
+            }
+            
+            // Scale game objects
+            scale = canvas.width / 800;
+        }
+        
+        let scale = 1;
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-// Game objects
-const game = {
-player: { x: 20, y: canvas.height / 2 - 50, width: 10, height: 100, speed: 6, score: 0 },
-ai: { x: canvas.width - 30, y: canvas.height / 2 - 50, width: 10, height: 100, speed: 4, score: 0 },
-ball: { x: canvas.width / 2, y: canvas.height / 2, radius: 8, speedX: 4, speedY: 3, maxSpeed: 12, trail: [] }
-};
+        // Audio
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(freq, duration, type = 'square') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialDecayTo && gain.gain.exponentialDecayTo(0.01, audioCtx.currentTime + duration);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
 
-// Input handling
-const keys = {};
-document.addEventListener('keydown', (e) => {
-keys[e.code] = true;
-if (e.code === 'Space') {
-e.preventDefault();
-togglePause();
-}
-if (e.code === 'KeyR') {
-resetGame();
-}
-});
-document.addEventListener('keyup', (e) => {
-keys[e.code] = false;
-});
+        // Game state
+        let gameRunning = false;
+        let playerScore = 0;
+        let aiScore = 0;
+        const winScore = 5;
+        
+        // Difficulty settings
+        const difficulties = {
+            easy: { aiSpeed: 3, aiReaction: 0.02, aiError: 40 },
+            medium: { aiSpeed: 5, aiReaction: 0.04, aiError: 20 },
+            hard: { aiSpeed: 7, aiReaction: 0.08, aiError: 10 },
+            impossible: { aiSpeed: 10, aiReaction: 0.15, aiError: 0 }
+        };
+        let currentDiff = 'easy';
 
-// Mobile controls
-document.getElementById('upBtn').addEventListener('touchstart', (e) => {
-e.preventDefault();
-keys['ArrowUp'] = true;
-});
-document.getElementById('upBtn').addEventListener('touchend', (e) => {
-e.preventDefault();
-keys['ArrowUp'] = false;
-});
-document.getElementById('downBtn').addEventListener('touchstart', (e) => {
-e.preventDefault();
-keys['ArrowDown'] = true;
-});
-document.getElementById('downBtn').addEventListener('touchend', (e) => {
-e.preventDefault();
-keys['ArrowDown'] = false;
-});
+        // Paddles & Ball (base values for 800x500)
+        const paddleW = 12;
+        const paddleH = 80;
+        const ballSize = 12;
+        
+        let player = { x: 20, y: 250 - paddleH/2, w: paddleW, h: paddleH, speed: 8, dy: 0 };
+        let ai = { x: 800 - 20 - paddleW, y: 250 - paddleH/2, w: paddleW, h: paddleH, speed: 5, targetY: 250 };
+        let ball = { x: 400, y: 250, r: ballSize/2, dx: 5, dy: 3, speed: 5, trail: [] };
 
-// Button events
-document.getElementById('pauseBtn').addEventListener('click', togglePause);
-document.getElementById('resetBtn').addEventListener('click', resetGame);
-document.getElementById('helpBtn').addEventListener('click', showInstructions);
+        // Particles
+        let particles = [];
 
-// Game functions
-function startGame() {
-document.getElementById('instructions').classList.add('hidden');
-gameRunning = true;
-gamePaused = false;
-gameLoop();
-}
+        function spawnParticles(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x * scale,
+                    y: y * scale,
+                    dx: (Math.random() - 0.5) * 8,
+                    dy: (Math.random() - 0.5) * 8,
+                    life: 1,
+                    color: color,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
 
-function togglePause() {
-if (!gameRunning) return;
-gamePaused = !gamePaused;
-document.getElementById('pauseBtn').textContent = gamePaused ? '▶️ Resume' : '⏸️ Pause';
-if (!gamePaused) gameLoop();
-}
+        // Screen shake
+        let shakeAmount = 0;
 
-function resetGame() {
-gameRunning = false;
-gamePaused = false;
-if (animationId) cancelAnimationFrame(animationId);
+        // Input
+        let keys = {};
+        document.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (['arrowup', 'arrowdown', 'w', 's', ' '].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
+            // Resume audio context on key press
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        });
+        document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
-// Reset positions and scores
-game.player.y = canvas.height / 2 - 50;
-game.ai.y = canvas.height / 2 - 50;
-game.ball.x = canvas.width / 2;
-game.ball.y = canvas.height / 2;
-game.ball.speedX = 4 * (Math.random() > 0.5 ? 1 : -1);
-game.ball.speedY = (Math.random() - 0.5) * 6;
-game.ball.trail = [];
-game.player.score = 0;
-game.ai.score = 0;
+        // Mobile controls
+        const upBtn = document.getElementById('upBtn');
+        const downBtn = document.getElementById('downBtn');
+        let mobileUp = false, mobileDown = false;
 
-updateScore();
-document.getElementById('gameOver').classList.remove('active');
-document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+        upBtn.addEventListener('touchstart', e => { e.preventDefault(); mobileUp = true; if (audioCtx.state === 'suspended') audioCtx.resume(); });
+        upBtn.addEventListener('touchend', e => { e.preventDefault(); mobileUp = false; });
+        downBtn.addEventListener('touchstart', e => { e.preventDefault(); mobileDown = true; if (audioCtx.state === 'suspended') audioCtx.resume(); });
+        downBtn.addEventListener('touchend', e => { e.preventDefault(); mobileDown = false; });
 
-// Restart
-startGame();
-}
+        // Touch on canvas
+        canvas.addEventListener('touchstart', e => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        });
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            player.y = Math.max(0, Math.min(canvas.height - player.h * scale, y - (player.h * scale) / 2)) / scale;
+        }, { passive: false });
 
-function showInstructions() {
-gameRunning = false;
-gamePaused = false;
-if (animationId) cancelAnimationFrame(animationId);
-document.getElementById('instructions').classList.remove('hidden');
-document.getElementById('gameOver').classList.remove('active');
-}
+        // Difficulty buttons
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentDiff = btn.dataset.diff;
+                if (!gameRunning) resetBall();
+            });
+        });
 
-function gameLoop() {
-if (!gameRunning || gamePaused) return;
+        // Theme
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+            const btn = document.querySelector('.theme-toggle');
+            btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+        }
 
-update();
-draw();
-animationId = requestAnimationFrame(gameLoop);
-}
+        function resetBall(scorer = null) {
+            ball.x = 400;
+            ball.y = 250;
+            ball.speed = 5;
+            ball.trail = [];
+            // Ball goes toward whoever got scored on
+            const dir = scorer === 'player' ? 1 : (scorer === 'ai' ? -1 : (Math.random() > 0.5 ? 1 : -1));
+            const angle = (Math.random() - 0.5) * Math.PI / 3;
+            ball.dx = dir * Math.cos(angle) * ball.speed;
+            ball.dy = Math.sin(angle) * ball.speed;
+        }
 
-function update() {
-// Player movement
-if (keys['KeyW'] || keys['ArrowUp']) {
-game.player.y = Math.max(0, game.player.y - game.player.speed);
-}
-if (keys['KeyS'] || keys['ArrowDown']) {
-game.player.y = Math.min(canvas.height - game.player.height, game.player.y + game.player.speed);
-}
+        function showMessage(text, duration = 1500) {
+            messageEl.textContent = text;
+            messageEl.classList.add('show');
+            setTimeout(() => messageEl.classList.remove('show'), duration);
+        }
 
-// AI movement (with some imperfection)
-const aiCenter = game.ai.y + game.ai.height / 2;
-const ballY = game.ball.y;
-const diff = ballY - aiCenter;
-const aiSpeed = game.ai.speed + (game.ai.score * 0.2); // AI gets faster as it scores
+        function startGame() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            if (playerScore >= winScore || aiScore >= winScore) {
+                resetGame();
+            }
+            
+            if (!gameRunning) {
+                gameRunning = true;
+                startBtn.textContent = 'Pause';
+                showMessage('GO!', 800);
+                playSound(440, 0.1);
+                setTimeout(() => playSound(880, 0.15), 100);
+            } else {
+                gameRunning = false;
+                startBtn.textContent = 'Resume';
+                showMessage('PAUSED');
+            }
+        }
 
-if (Math.abs(diff) > 5) {
-if (diff > 0) {
-game.ai.y = Math.min(canvas.height - game.ai.height, game.ai.y + aiSpeed);
-} else {
-game.ai.y = Math.max(0, game.ai.y - aiSpeed);
-}
-}
+        function resetGame() {
+            gameRunning = false;
+            playerScore = 0;
+            aiScore = 0;
+            playerScoreEl.textContent = '0';
+            aiScoreEl.textContent = '0';
+            player.y = 250 - paddleH/2;
+            ai.y = 250 - paddleH/2;
+            resetBall();
+            particles = [];
+            startBtn.textContent = 'Start';
+            messageEl.classList.remove('show');
+        }
 
-// Ball movement
-game.ball.x += game.ball.speedX;
-game.ball.y += game.ball.speedY;
+        function update() {
+            if (!gameRunning) return;
 
-// Ball trail
-game.ball.trail.push({ x: game.ball.x, y: game.ball.y });
-if (game.ball.trail.length > 8) {
-game.ball.trail.shift();
-}
+            const diff = difficulties[currentDiff];
 
-// Ball collision with top/bottom
-if (game.ball.y - game.ball.radius <= 0 || game.ball.y + game.ball.radius >= canvas.height) {
-game.ball.speedY = -game.ball.speedY;
-createParticles(game.ball.x, game.ball.y, '#67e8f9', 5);
-}
+            // Player movement
+            player.dy = 0;
+            if (keys['arrowup'] || keys['w'] || mobileUp) player.dy = -player.speed;
+            if (keys['arrowdown'] || keys['s'] || mobileDown) player.dy = player.speed;
+            
+            player.y += player.dy;
+            player.y = Math.max(0, Math.min(500 - player.h, player.y));
 
-// Ball collision with paddles
-if (game.ball.x - game.ball.radius <= game.player.x + game.player.width &&
-game.ball.y >= game.player.y && game.ball.y <= game.player.y + game.player.height &&
-game.ball.speedX < 0) {
+            // AI movement
+            const aiCenter = ai.y + ai.h / 2;
+            const targetY = ball.y + (Math.random() - 0.5) * diff.aiError;
+            ai.targetY += (targetY - ai.targetY) * diff.aiReaction;
+            
+            if (aiCenter < ai.targetY - 5) {
+                ai.y += Math.min(diff.aiSpeed, ai.targetY - aiCenter);
+            } else if (aiCenter > ai.targetY + 5) {
+                ai.y -= Math.min(diff.aiSpeed, aiCenter - ai.targetY);
+            }
+            ai.y = Math.max(0, Math.min(500 - ai.h, ai.y));
 
-// Calculate hit position
-const hitPos = (game.ball.y - game.player.y - game.player.height / 2) / (game.player.height / 2);
-game.ball.speedX = Math.abs(game.ball.speedX) * 1.05; // Increase speed
-game.ball.speedY = hitPos * 6;
+            // Ball movement
+            ball.trail.unshift({ x: ball.x, y: ball.y });
+            if (ball.trail.length > 15) ball.trail.pop();
 
-// Cap max speed
-game.ball.speedX = Math.min(game.ball.speedX, game.ball.maxSpeed);
-createParticles(game.ball.x, game.ball.y, '#00d68f', 8);
-}
+            ball.x += ball.dx;
+            ball.y += ball.dy;
 
-if (game.ball.x + game.ball.radius >= game.ai.x &&
-game.ball.y >= game.ai.y && game.ball.y <= game.ai.y + game.ai.height &&
-game.ball.speedX > 0) {
+            // Wall collision
+            if (ball.y - ball.r <= 0 || ball.y + ball.r >= 500) {
+                ball.dy *= -1;
+                ball.y = ball.y - ball.r <= 0 ? ball.r : 500 - ball.r;
+                playSound(300, 0.05);
+                spawnParticles(ball.x, ball.y, '#67e8f9', 5);
+            }
 
-const hitPos = (game.ball.y - game.ai.y - game.ai.height / 2) / (game.ai.height / 2);
-game.ball.speedX = -Math.abs(game.ball.speedX) * 1.05;
-game.ball.speedY = hitPos * 6;
+            // Paddle collision
+            // Player paddle
+            if (ball.dx < 0 && 
+                ball.x - ball.r <= player.x + player.w &&
+                ball.x + ball.r >= player.x &&
+                ball.y >= player.y && 
+                ball.y <= player.y + player.h) {
+                
+                const hitPos = (ball.y - player.y) / player.h - 0.5;
+                ball.dx = Math.abs(ball.dx);
+                ball.dy = hitPos * 8;
+                ball.speed = Math.min(ball.speed + 0.3, 12);
+                
+                const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+                ball.dx = (ball.dx / speed) * ball.speed;
+                ball.dy = (ball.dy / speed) * ball.speed;
+                
+                ball.x = player.x + player.w + ball.r;
+                
+                playSound(440, 0.08);
+                spawnParticles(ball.x, ball.y, '#0ea5e9', 15);
+                shakeAmount = 5;
+            }
 
-game.ball.speedX = Math.max(game.ball.speedX, -game.ball.maxSpeed);
-createParticles(game.ball.x, game.ball.y, '#f59e0b', 8);
-}
+            // AI paddle
+            if (ball.dx > 0 && 
+                ball.x + ball.r >= ai.x &&
+                ball.x - ball.r <= ai.x + ai.w &&
+                ball.y >= ai.y && 
+                ball.y <= ai.y + ai.h) {
+                
+                const hitPos = (ball.y - ai.y) / ai.h - 0.5;
+                ball.dx = -Math.abs(ball.dx);
+                ball.dy = hitPos * 8;
+                ball.speed = Math.min(ball.speed + 0.3, 12);
+                
+                const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+                ball.dx = (ball.dx / speed) * ball.speed;
+                ball.dy = (ball.dy / speed) * ball.speed;
+                
+                ball.x = ai.x - ball.r;
+                
+                playSound(330, 0.08);
+                spawnParticles(ball.x, ball.y, '#0ea5e9', 15);
+                shakeAmount = 5;
+            }
 
-// Scoring
-if (game.ball.x < 0) {
-game.ai.score++;
-resetBall();
-createParticles(canvas.width - 50, canvas.height / 2, '#ef4444', 15);
-}
-if (game.ball.x > canvas.width) {
-game.player.score++;
-resetBall();
-createParticles(50, canvas.height / 2, '#00d68f', 15);
-}
+            // Scoring
+            if (ball.x < -ball.r) {
+                aiScore++;
+                aiScoreEl.textContent = aiScore;
+                playSound(220, 0.3, 'sawtooth');
+                spawnParticles(0, ball.y, '#ef4444', 30);
+                shakeAmount = 15;
+                
+                if (aiScore >= winScore) {
+                    gameRunning = false;
+                    showMessage('AI WINS!', 3000);
+                    startBtn.textContent = 'Play Again';
+                } else {
+                    resetBall('ai');
+                }
+            }
 
-updateScore();
+            if (ball.x > 800 + ball.r) {
+                playerScore++;
+                playerScoreEl.textContent = playerScore;
+                playSound(660, 0.15);
+                setTimeout(() => playSound(880, 0.15), 100);
+                spawnParticles(800, ball.y, '#22c55e', 30);
+                shakeAmount = 10;
+                
+                if (playerScore >= winScore) {
+                    gameRunning = false;
+                    showMessage('YOU WIN! 🎉', 3000);
+                    startBtn.textContent = 'Play Again';
+                } else {
+                    resetBall('player');
+                }
+            }
 
-// Check win condition
-if (game.player.score >= 7 || game.ai.score >= 7) {
-endGame();
-}
-}
+            // Update particles
+            particles = particles.filter(p => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.life -= 0.02;
+                p.dy += 0.1; // gravity
+                return p.life > 0;
+            });
 
-function resetBall() {
-game.ball.x = canvas.width / 2;
-game.ball.y = canvas.height / 2;
-game.ball.speedX = 4 * (Math.random() > 0.5 ? 1 : -1);
-game.ball.speedY = (Math.random() - 0.5) * 4;
-game.ball.trail = [];
-}
+            // Decay shake
+            shakeAmount *= 0.9;
+        }
 
-function draw() {
-// Clear canvas with fade effect
-ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function draw() {
+            ctx.save();
+            
+            // Apply screen shake
+            if (shakeAmount > 0.5) {
+                ctx.translate(
+                    (Math.random() - 0.5) * shakeAmount * scale,
+                    (Math.random() - 0.5) * shakeAmount * scale
+                );
+            }
 
-// Draw center line
-ctx.strokeStyle = '#1e2d3d';
-ctx.lineWidth = 2;
-ctx.setLineDash([10, 10]);
-ctx.beginPath();
-ctx.moveTo(canvas.width / 2, 0);
-ctx.lineTo(canvas.width / 2, canvas.height);
-ctx.stroke();
-ctx.setLineDash([]);
+            // Clear
+            const isDark = !document.body.classList.contains('light');
+            ctx.fillStyle = isDark ? '#111' : '#e5e5e5';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-// Draw ball trail
-game.ball.trail.forEach((pos, index) => {
-const alpha = (index / game.ball.trail.length) * 0.3;
-ctx.fillStyle = `rgba(103, 232, 249, ${alpha})`;
-ctx.beginPath();
-ctx.arc(pos.x, pos.y, game.ball.radius * 0.5, 0, Math.PI * 2);
-ctx.fill();
-});
+            // Center line
+            ctx.setLineDash([10 * scale, 10 * scale]);
+            ctx.strokeStyle = isDark ? '#333' : '#ccc';
+            ctx.lineWidth = 2 * scale;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
 
-// Draw ball with glow
-ctx.shadowBlur = 15;
-ctx.shadowColor = '#67e8f9';
-ctx.fillStyle = '#67e8f9';
-ctx.beginPath();
-ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, Math.PI * 2);
-ctx.fill();
+            // Ball trail
+            ball.trail.forEach((pos, i) => {
+                const alpha = (1 - i / ball.trail.length) * 0.5;
+                const size = ball.r * (1 - i / ball.trail.length) * scale;
+                ctx.beginPath();
+                ctx.arc(pos.x * scale, pos.y * scale, size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(14, 165, 233, ${alpha})`;
+                ctx.fill();
+            });
 
-// Draw paddles with glow
-ctx.shadowBlur = 10;
-ctx.shadowColor = '#0ea5e9';
-ctx.fillStyle = '#0ea5e9';
-ctx.fillRect(game.player.x, game.player.y, game.player.width, game.player.height);
-ctx.fillRect(game.ai.x, game.ai.y, game.ai.width, game.ai.height);
+            // Ball
+            ctx.beginPath();
+            ctx.arc(ball.x * scale, ball.y * scale, ball.r * scale, 0, Math.PI * 2);
+            ctx.fillStyle = '#0ea5e9';
+            ctx.shadowColor = '#0ea5e9';
+            ctx.shadowBlur = 20 * scale;
+            ctx.fill();
+            ctx.shadowBlur = 0;
 
-// Reset shadow
-ctx.shadowBlur = 0;
-}
+            // Ball inner glow
+            ctx.beginPath();
+            ctx.arc(ball.x * scale, ball.y * scale, ball.r * 0.5 * scale, 0, Math.PI * 2);
+            ctx.fillStyle = '#67e8f9';
+            ctx.fill();
 
-function createParticles(x, y, color, count) {
-for (let i = 0; i < count; i++) {
-const particle = document.createElement('div');
-particle.className = 'particle';
-particle.style.left = x + 'px';
-particle.style.top = y + 'px';
-particle.style.background = color;
-particle.style.width = (Math.random() * 4 + 2) + 'px';
-particle.style.height = particle.style.width;
+            // Paddles
+            ctx.shadowColor = '#0ea5e9';
+            ctx.shadowBlur = 15 * scale;
+            
+            // Player paddle
+            ctx.fillStyle = '#0ea5e9';
+            ctx.beginPath();
+            ctx.roundRect(player.x * scale, player.y * scale, player.w * scale, player.h * scale, 4 * scale);
+            ctx.fill();
 
-const moveX = (Math.random() - 0.5) * 100;
-const moveY = (Math.random() - 0.5) * 100;
-particle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            // AI paddle
+            ctx.fillStyle = '#67e8f9';
+            ctx.beginPath();
+            ctx.roundRect(ai.x * scale, ai.y * scale, ai.w * scale, ai.h * scale, 4 * scale);
+            ctx.fill();
 
-document.body.appendChild(particle);
-setTimeout(() => particle.remove(), 1000);
-}
-}
+            ctx.shadowBlur = 0;
 
-function updateScore() {
-document.getElementById('playerScore').textContent = game.player.score;
-document.getElementById('aiScore').textContent = game.ai.score;
-}
+            // Particles
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * p.life * scale, 0, Math.PI * 2);
+                ctx.fillStyle = p.color + Math.floor(p.life * 255).toString(16).padStart(2, '0');
+                ctx.fill();
+            });
 
-function endGame() {
-gameRunning = false;
-const gameOverEl = document.getElementById('gameOver');
-const titleEl = document.getElementById('gameOverTitle');
-const textEl = document.getElementById('gameOverText');
-const scoreEl = document.getElementById('finalScore');
+            ctx.restore();
+        }
 
-if (game.player.score >= 7) {
-titleEl.textContent = '🎉 You Win!';
-textEl.textContent = 'Incredible! You defeated the AI!';
-createParticles(canvas.width / 2, canvas.height / 2, '#00d68f', 20);
-} else {
-titleEl.textContent = '💀 AI Wins!';
-textEl.textContent = 'The AI was too strong this time!';
-createParticles(canvas.width / 2, canvas.height / 2, '#ef4444', 20);
-}
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
 
-scoreEl.textContent = `Player ${game.player.score} - ${game.ai.score} AI`;
-gameOverEl.classList.add('active');
-}
+        // Start
+        resetBall();
+        gameLoop();
 
-// Resize canvas on window resize
-window.addEventListener('resize', () => {
-const container = canvas.parentElement;
-const rect = container.getBoundingClientRect();
-const maxWidth = Math.min(800, rect.width - 40);
-const maxHeight = Math.min(400, rect.height - 40);
-
-canvas.style.width = maxWidth + 'px';
-canvas.style.height = maxHeight + 'px';
-});
-
-// Initial resize
-window.dispatchEvent(new Event('resize'));
-
-// Show instructions on load
-showInstructions();
-</script>
-
+        // Space to start/pause
+        document.addEventListener('keydown', e => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                startGame();
+            }
+        });
+    </script>
 </body>
 </html>
