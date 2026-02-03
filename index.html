@@ -218,6 +218,62 @@
             font-size: 0.875rem;
             color: var(--text2);
         }
+        .sensitivity {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg2);
+            border: 1px solid var(--bg3);
+            border-radius: 0.5rem;
+        }
+        .sensitivity label {
+            font-size: 0.875rem;
+            color: var(--text2);
+            white-space: nowrap;
+        }
+        .sensitivity input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--bg3);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            min-width: 100px;
+        }
+        .sensitivity input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent);
+            transition: transform 0.2s;
+        }
+        .sensitivity input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .sensitivity input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px var(--accent);
+        }
+        .sensitivity .sens-value {
+            font-size: 0.875rem;
+            color: var(--accent);
+            font-weight: 600;
+            min-width: 2rem;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -259,6 +315,12 @@
             <button class="diff-btn" data-diff="medium">Medium</button>
             <button class="diff-btn" data-diff="hard">Hard</button>
             <button class="diff-btn" data-diff="impossible">💀</button>
+        </div>
+
+        <div class="sensitivity">
+            <label>Sensitivity</label>
+            <input type="range" id="sensSlider" min="3" max="20" value="8">
+            <span class="sens-value" id="sensValue">8</span>
         </div>
 
         <p class="instructions">Use ↑↓ or W/S to move • Touch buttons on mobile</p>
@@ -397,6 +459,14 @@
                 currentDiff = btn.dataset.diff;
                 if (!gameRunning) resetBall();
             });
+        });
+
+        // Sensitivity slider
+        const sensSlider = document.getElementById('sensSlider');
+        const sensValue = document.getElementById('sensValue');
+        sensSlider.addEventListener('input', () => {
+            player.speed = parseInt(sensSlider.value);
+            sensValue.textContent = sensSlider.value;
         });
 
         // Theme
